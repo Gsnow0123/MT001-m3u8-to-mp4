@@ -1,0 +1,21 @@
+name: Build FFmpeg
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  windows-x64:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Install cross compiler
+        run: sudo apt-get update && sudo apt-get install -y gcc-mingw-w64-x86-64 nasm make
+      - name: Build LGPL-only FFmpeg from pinned source
+        run: bash scripts/build-ffmpeg.sh
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: ffmpeg-windows-x64
+          path: .build/ffmpeg-package/
+          retention-days: 14
+          if-no-files-found: error

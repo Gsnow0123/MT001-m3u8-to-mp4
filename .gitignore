@@ -1,0 +1,17 @@
+# Only reviewed project files may enter the public repository.
+/*
+!/.gitignore
+!/LICENSE
+!/README.md
+!/demo-catalog.txt
+!/src/
+!/scripts/
+!/.github/
+!/docs/
+*.exe
+*.dll
+*.pdb
+*.log
+*.mp4
+*.mp4.json
+settings.json

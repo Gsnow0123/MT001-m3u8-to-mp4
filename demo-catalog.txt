@@ -1,0 +1,19 @@
+# MT001-DEMO
+# 虚构演示 / Fictional demo. URLs use the reserved .invalid domain.
+# All keys and access codes below are dummy values. Nothing is downloadable.
+示例章节 A / Example section A
+    示例视频 01 / Example video 01
+        key-> AAAAAAAAAAAAAAAAAAAAAA==
+        hls-> https://example.invalid/video/01.m3u8
+        源码地址-> https://example.invalid/netdisk/demo01    DEMO
+    示例视频 02 / Example video 02
+        hls-> https://example.invalid/video/02.m3u8
+        课前预习-> https://example.invalid/reading/demo02
+示例章节 B / Example section B
+    示例视频 03 / Example video 03
+        key-> 00000000000000000000000000000000
+        hls-> https://example.invalid/video/03.m3u8
+        其他资料-> https://example.invalid/resources/demo03?pwd=DEMO
+    仅含资料 / Resources only
+        源码地址-> https://example.invalid/netdisk/demo04    提取码：DEMO
+        参考文档-> https://example.invalid/docs/demo04
