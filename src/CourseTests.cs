@@ -401,10 +401,16 @@ public static class CourseTests
                     Check(form.CourseTree.Nodes[0].Text.StartsWith("测试章节"), "Input titles translated");
                     foreach (int width in new[] { 980, 760 })
                     {
+                        var tabs = (TabControl)form.ResourceView.Parent.Parent; tabs.SelectedTab = (TabPage)form.ResourceView.Parent;
                         form.Size = new Size(width, width == 980 ? 660 : 520); form.PerformLayout(); Application.DoEvents();
                         Check(form.SearchBox.Width > 25 && form.SingleVideoButton.Right <= form.SingleVideoButton.Parent.ClientSize.Width, "Toolbar clipping");
+                        foreach (Button button in new[] { form.ResourceView.CopyUrl, form.ResourceView.CopyCode, form.ResourceView.CopyShare, form.ResourceView.OpenLink })
+                            Check(button.ClientSize.Height >= TextRenderer.MeasureText(button.Text, button.Font).Height + 8, "Resource button text clipped: " + button.Text);
+                        Check(form.ResourceView.CopyUrl.Bottom <= form.ResourceView.CopyShare.Top, "Resource button rows overlap");
                         using (var bitmap = new Bitmap(form.Width, form.Height)) { form.DrawToBitmap(bitmap, new Rectangle(0, 0, form.Width, form.Height)); bitmap.Save(Path.Combine(Work, "layout-" + choice + "-" + width + ".png")); }
                     }
+                    form.LanguageBox.SelectedIndex = choice == "en" ? 0 : 1;
+                    Check(form.LanguageRestartRequested && AppConfig.Load(uiRoot).Language == (choice == "en" ? "zh" : "en"), "Language selection was not persisted");
                 }
                 L.English = choice == "en";
                 using (var form = new SingleVideoForm(Root)) { form.Location = new Point(-20000, -20000); form.ShowInTaskbar = false; form.Show(); Check(form.Start.Text == (choice == "en" ? "Start" : "开始转换"), "Single video not localized"); }
@@ -413,14 +419,14 @@ public static class CourseTests
         L.English = false;
         Run("single-video UI conversion, validation and explicit overwrite rejection", delegate
         {
-            var fixture = new Fixture(FixtureFolder, new byte[16]);
-            using (var form = new SingleVideoForm(Root, (output, ffmpeg) => Engine(fixture, output)))
+            var fixture = new Fixture(FixtureFolder, new byte[16]); string app = Path.Combine(Work, "single-app"); Directory.CreateDirectory(app);
+            using (var form = new SingleVideoForm(app, (output, ffmpeg) => Engine(fixture, output)))
             {
                 form.StartPosition = FormStartPosition.Manual; form.Location = new Point(-20000, -20000); form.ShowInTaskbar = false; form.Show();
                 int notices = 0; form.NotificationOverride = text => notices++; form.Address.Text = "https://example.invalid/demo.m3u8"; form.Output.Text = Path.Combine(Work, "single", "示例 video.mp4");
                 SynchronizationContext.SetSynchronizationContext(new WindowsFormsSynchronizationContext()); Pump(form.StartAsync()); Check(notices == 1 && !File.Exists(form.Output.Text), "Demo accepted by single video");
                 form.Address.Text = "https://fixture.test/index.m3u8"; form.Key.Text = "00000000000000000000000000000000";
-                SynchronizationContext.SetSynchronizationContext(new WindowsFormsSynchronizationContext()); Pump(form.StartAsync()); Check(File.Exists(form.Output.Text) && form.Progress.Value == 100 && form.Key.Text == "", "Single-video UI failed");
+                SynchronizationContext.SetSynchronizationContext(new WindowsFormsSynchronizationContext()); Pump(form.StartAsync()); Check(File.Exists(form.Output.Text) && form.Progress.Value == 100 && !File.Exists(Path.Combine(app, "settings.json")), "Single-video UI failed or input was persisted");
                 long calls = ConversionEngine.FetchRequestCount; form.OverwriteOverride = () => false;
                 SynchronizationContext.SetSynchronizationContext(new WindowsFormsSynchronizationContext()); Pump(form.StartAsync()); Check(ConversionEngine.FetchRequestCount == calls, "Rejected overwrite started download");
             }

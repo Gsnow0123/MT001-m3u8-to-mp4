@@ -21,24 +21,35 @@ namespace CourseStudy
             public override string ToString() { return Link + " · " + Owner; }
         }
         private readonly IResourceActions actions;
+        private readonly TableLayoutPanel table, buttons;
         public readonly ListBox Items = new ListBox();
         public readonly TextBox Preview = new TextBox();
         public readonly Button CopyUrl = new Button(), CopyCode = new Button(), CopyShare = new Button(), OpenLink = new Button();
         public ResourcesPanel(IResourceActions resourceActions = null)
         {
-            actions = resourceActions ?? new ResourceActions(); Dock = DockStyle.Fill;
-            var table = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 1, RowCount = 3, Padding = new Padding(2) };
+            actions = resourceActions ?? new ResourceActions(); Dock = DockStyle.Fill; AutoScroll = true;
+            table = new TableLayoutPanel { Dock = DockStyle.Top, ColumnCount = 1, RowCount = 3, Padding = new Padding(2), Height = 260 };
             table.RowStyles.Add(new RowStyle(SizeType.Percent, 45)); table.RowStyles.Add(new RowStyle(SizeType.Percent, 55)); table.RowStyles.Add(new RowStyle(SizeType.Absolute, 70));
             Items.Dock = DockStyle.Fill; Items.HorizontalScrollbar = true; Items.IntegralHeight = false; table.Controls.Add(Items, 0, 0);
             Preview.Dock = DockStyle.Fill; Preview.Multiline = true; Preview.ReadOnly = true; Preview.ScrollBars = ScrollBars.Both; Preview.WordWrap = false; table.Controls.Add(Preview, 0, 1);
-            var buttons = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 2, RowCount = 2, Margin = Padding.Empty };
+            buttons = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 2, RowCount = 2, Margin = Padding.Empty };
             buttons.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50)); buttons.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50));
+            buttons.RowStyles.Add(new RowStyle(SizeType.Percent, 50)); buttons.RowStyles.Add(new RowStyle(SizeType.Percent, 50));
             int n = 0; foreach (var pair in new[] { Tuple.Create(CopyUrl, "复制地址"), Tuple.Create(CopyCode, "复制提取码"), Tuple.Create(CopyShare, "复制分享信息"), Tuple.Create(OpenLink, "浏览器打开") })
-            { pair.Item1.Text = L.T(pair.Item2); pair.Item1.Dock = DockStyle.Fill; pair.Item1.FlatStyle = FlatStyle.Flat; buttons.Controls.Add(pair.Item1, n % 2, n / 2); n++; }
+            { pair.Item1.Text = L.T(pair.Item2); pair.Item1.Dock = DockStyle.Fill; pair.Item1.FlatStyle = FlatStyle.Flat; pair.Item1.MinimumSize = new Size(0, 32); buttons.Controls.Add(pair.Item1, n % 2, n / 2); n++; }
             table.Controls.Add(buttons, 0, 2); Controls.Add(table);
             Items.SelectedIndexChanged += delegate { RefreshItem(); };
+            SizeChanged += delegate { SizeTable(); }; FontChanged += delegate { SizeTable(); };
             CopyUrl.Click += delegate { Act(false, r => r.Url); }; CopyCode.Click += delegate { Act(false, r => r.Code); }; CopyShare.Click += delegate { Act(false, r => r.ShareText); }; OpenLink.Click += delegate { Act(true, r => r.Url); };
-            RefreshItem();
+            RefreshItem(); SizeTable();
+        }
+        private void SizeTable()
+        {
+            int rowHeight = buttons.Controls.Cast<Control>().Max(button => TextRenderer.MeasureText(button.Text, button.Font).Height + button.Margin.Vertical + 16);
+            table.RowStyles[2].Height = rowHeight * 2;
+            int minimum = rowHeight * 2 + Math.Max(120, Font.Height * 7);
+            int height = Math.Max(minimum, ClientSize.Height - Padding.Vertical);
+            if (table.Height != height) table.Height = height;
         }
         public void LoadNode(CatalogNode node)
         {

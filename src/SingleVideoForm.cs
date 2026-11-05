@@ -52,6 +52,7 @@ namespace CourseStudy
                 if (!closingAfterCancel && MessageBox.Show(this, L.T("当前视频还在转换。取消并关闭吗？缓存会保留。"), Text, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                 { closingAfterCancel = true; cancellation.Cancel(); }
             };
+            FormClosed += delegate { Key.Clear(); Address.Clear(); };
         }
         private void Browse(object sender, EventArgs e)
         { using (var dialog = new SaveFileDialog { Filter = "MP4 (*.mp4)|*.mp4", FileName = "video.mp4", OverwritePrompt = false }) if (dialog.ShowDialog(this) == DialogResult.OK) Output.Text = dialog.FileName; }
@@ -97,7 +98,7 @@ namespace CourseStudy
             catch (Exception ex) { status.Text = L.T("转换失败，可重试"); Notice(Files.Redact(ex.Message)); }
             finally
             {
-                receiving = false; cancellation.Dispose(); cancellation = null; Key.Clear();
+                receiving = false; cancellation.Dispose(); cancellation = null;
                 Start.Enabled = Address.Enabled = Key.Enabled = Output.Enabled = browse.Enabled = true; CancelJob.Enabled = false;
                 if (closingAfterCancel) Close();
             }

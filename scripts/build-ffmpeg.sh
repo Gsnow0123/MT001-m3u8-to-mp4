@@ -9,6 +9,8 @@ mkdir -p "$work" "$package/licenses"
 curl --fail --location --retry 3 "https://api.github.com/repos/FFmpeg/FFmpeg/tarball/$commit" -o "$package/ffmpeg-source.tar.gz"
 tar -xzf "$package/ffmpeg-source.tar.gz" -C "$work" --strip-components=1
 cd "$work"
+# A tarball nested inside the app repository must not inherit its Git version.
+printf '7.1.5\n' > VERSION
 flags=(
   --target-os=mingw32 --arch=x86_64 --cross-prefix=x86_64-w64-mingw32-
   --disable-autodetect --disable-debug --disable-doc --disable-network
@@ -16,7 +18,7 @@ flags=(
   --enable-ffmpeg --enable-protocol=file
   --enable-demuxer=hls,mpegts,mov --enable-muxer=mp4,hls,mpegts,null
   --enable-parser=h264,hevc,mpegvideo,mpeg4video,aac,aac_latm,mpegaudio,ac3
-  --enable-decoder=h264,hevc,mpeg2video,mpeg4,aac,aac_fixed,aac_latm,mp2,mp3,ac3,eac3,pcm_s16le,pcm_f32le,rawvideo
+  --enable-decoder=h264,hevc,mpeg2video,mpeg4,aac,aac_fixed,aac_latm,mp2,mp3,ac3,eac3,pcm_s16le,pcm_f32le,rawvideo,wrapped_avframe
   --enable-encoder=mpeg2video,aac,wrapped_avframe,pcm_s16le
   --enable-bsf=aac_adtstoasc,extract_extradata,h264_mp4toannexb,hevc_mp4toannexb
   --enable-indev=lavfi --enable-filter=abuffer,abuffersink,buffer,buffersink,testsrc2,sine,anull,null,aformat,aresample,format,scale
@@ -33,6 +35,7 @@ cp ffbuild/config.log "$package/config.log"
   echo "Upstream commit: $commit"
   echo "Source URL: https://github.com/FFmpeg/FFmpeg/tree/$commit"
   echo 'No external codec libraries. GPL, nonfree and network components are disabled.'
+  echo 'Generated metadata: VERSION contains 7.1.5. No upstream code changes.'
   printf 'Configure:'; printf ' %q' "${flags[@]}"; printf '\n'
   x86_64-w64-mingw32-gcc --version | head -n1
   nasm -v

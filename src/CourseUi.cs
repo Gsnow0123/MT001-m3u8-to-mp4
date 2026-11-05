@@ -272,7 +272,7 @@ namespace CourseStudy
             Lesson[] queue = QueueLessons(); if (queue.Length == 0) return;
             bool autoPlay = AutoPlayBox.Checked;
             if (autoPlay && !File.Exists(config.PotPlayerPath) && !SelectPlayer()) return;
-            job = new CancellationTokenSource(); SetBusy(true); state.Text = "正在处理当前课程…"; JobProgress.Value = 0;
+            job = new CancellationTokenSource(); SetBusy(true); state.Text = L.T("正在处理当前课程…"); JobProgress.Value = 0;
             CancellationToken token = job.Token;
             var completed = new List<string>(); var failures = new List<string>(); var successful = new HashSet<string>();
             int currentItem = 0, completedItems = 0; bool acceptingProgress = false, cancelled = false; string warning = null;
