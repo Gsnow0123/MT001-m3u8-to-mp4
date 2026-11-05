@@ -15,7 +15,7 @@ flags=(
   --target-os=mingw32 --arch=x86_64 --cross-prefix=x86_64-w64-mingw32-
   --disable-autodetect --disable-debug --disable-doc --disable-network
   --disable-ffplay --disable-ffprobe --disable-everything
-  --enable-ffmpeg --enable-protocol=file
+  --enable-ffmpeg --enable-protocol=file,pipe
   --enable-demuxer=hls,mpegts,mov --enable-muxer=mp4,hls,mpegts,null
   --enable-parser=h264,hevc,mpegvideo,mpeg4video,aac,aac_latm,mpegaudio,ac3
   --enable-decoder=h264,hevc,mpeg2video,mpeg4,aac,aac_fixed,aac_latm,mp2,mp3,ac3,eac3,pcm_s16le,pcm_f32le,rawvideo,wrapped_avframe
