@@ -12,8 +12,10 @@ foreach ($file in @('ffmpeg.exe','ffmpeg-source.tar.gz','build-info.txt','config
 $expected = [regex]::Match([IO.File]::ReadAllText((Join-Path $FfmpegPackage 'build-info.txt')),'(?m)^([0-9a-f]{64})\s+.*ffmpeg\.exe\s*$').Groups[1].Value
 $actual = (Get-FileHash -LiteralPath (Join-Path $FfmpegPackage 'ffmpeg.exe') -Algorithm SHA256).Hash
 if (!$expected -or $expected -ne $actual) { throw 'FFmpeg executable does not match the recorded build hash.' }
+$sourceExpected = [regex]::Match([IO.File]::ReadAllText((Join-Path $FfmpegPackage 'build-info.txt')),'(?m)^([0-9a-f]{64})\s+.*ffmpeg-source\.tar\.gz\s*$').Groups[1].Value
+if (!$sourceExpected -or $sourceExpected -ne (Get-FileHash -LiteralPath (Join-Path $FfmpegPackage 'ffmpeg-source.tar.gz') -Algorithm SHA256).Hash) { throw 'FFmpeg source archive does not match the build record.' }
 $license = (& (Join-Path $FfmpegPackage 'ffmpeg.exe') -L 2>&1 | Out-String)
-if ($license -notmatch 'GNU Lesser General Public License' -or $license -match '(--enable-gpl|--enable-nonfree)') { throw 'This package requires the reviewed LGPL-only FFmpeg build.' }
+if ($license -notmatch 'GNU\s+Lesser\s+General\s+Public\s+License' -or $license -match '(--enable-gpl|--enable-nonfree)') { throw 'This package requires the reviewed LGPL-only FFmpeg build.' }
 New-Item -ItemType Directory -Path (Join-Path $portable 'third-party') -Force | Out-Null
 Copy-Item -LiteralPath (Join-Path $build 'MT001-m3u8-to-mp4.exe') -Destination $portable
 Copy-Item -LiteralPath (Join-Path $FfmpegPackage 'ffmpeg.exe') -Destination $portable
