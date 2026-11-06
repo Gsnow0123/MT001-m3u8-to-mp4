@@ -8,7 +8,7 @@ if (Test-Path -LiteralPath (Join-Path $root '.git')) {
     $files += @($tracked | ForEach-Object { Join-Path $root $_ })
 } else {
     foreach ($folder in @('src','scripts','.github','docs')) { $files += @(Get-ChildItem -LiteralPath (Join-Path $root $folder) -Recurse -File -ErrorAction SilentlyContinue | ForEach-Object {$_.FullName}) }
-    $files += @('README.md','LICENSE','.gitignore','demo-catalog.txt' | ForEach-Object { Join-Path $root $_ })
+    $files += @('README.md','README.zh-CN.md','LICENSE','.gitignore','demo-catalog.txt' | ForEach-Object { Join-Path $root $_ })
 }
 if ($ReleaseDirectory) { $files += @(Get-ChildItem -LiteralPath $ReleaseDirectory -Recurse -File | ForEach-Object {$_.FullName}) }
 $forbidden = @($files | Where-Object { [IO.Path]::GetFileName($_) -match '(?i)(\.java$|\.mp4(?:\.json)?$|\.log$|^settings\.json$|\.pdb$)' })

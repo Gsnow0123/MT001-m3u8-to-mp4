@@ -19,7 +19,7 @@ if ($license -notmatch 'GNU\s+Lesser\s+General\s+Public\s+License' -or $license 
 New-Item -ItemType Directory -Path (Join-Path $portable 'third-party') -Force | Out-Null
 Copy-Item -LiteralPath (Join-Path $build 'MT001-m3u8-to-mp4.exe') -Destination $portable
 Copy-Item -LiteralPath (Join-Path $FfmpegPackage 'ffmpeg.exe') -Destination $portable
-foreach ($file in @('demo-catalog.txt','README.md','LICENSE')) { Copy-Item -LiteralPath (Join-Path $root $file) -Destination $portable }
+foreach ($file in @('demo-catalog.txt','README.md','README.zh-CN.md','LICENSE')) { Copy-Item -LiteralPath (Join-Path $root $file) -Destination $portable }
 Copy-Item -LiteralPath (Join-Path $root 'docs') -Destination $portable -Recurse
 $third = Join-Path $portable 'third-party'
 Copy-Item -LiteralPath (Join-Path $FfmpegPackage 'ffmpeg-source.tar.gz') -Destination $third
